@@ -25,7 +25,28 @@ var mapw = w, maph = w * 0.647
 	, cbp = null
 	, sMonth = 5
 	, sYear = 2015
+	, sLastMonth = 5
+	, sLastYear = 2015
 
+// draw the map
+var svg = d3
+	.select("body")
+	.append("div")
+	    .attr("class", "main")
+		.append("svg:svg")
+		    .attr("width", w)
+		    .attr("height", h)
+		  	.append("svg:g");
+
+svg.append("svg:image")
+   .attr('class', 'mainmap')
+   .attr('x',0)
+   .attr('y',0)
+   .attr('width', mapw)
+   .attr('height', maph)
+   .attr("xlink:href","img/bgmap.svg")
+
+// prepare functions
 cmap = d3.layout.conflictmap()
     .size([w, h])
     .value(function(conflict) { return conflict.strikes; });
@@ -37,7 +58,7 @@ cbp = d3.nest()
     .rollup(function(conflictsGroup){
       return {
         totalAttacks: conflictsGroup.filter(function(c){ return c.date.year == sYear && c.date.month+1 == sMonth}).length,
-        totalStrikes: d3.sum(conflictsGroup, function(c){ 
+        totalStrikes: d3.sum(conflictsGroup, function(c){
         	if (c.date.year == sYear && c.date.month+1 == sMonth ) return c.strikes;
         	return 0;
         }),
@@ -56,22 +77,10 @@ ct = d3.nest()
       }
     })
 
-var svg = d3
-	.select("body")
-	.append("div")
-	    .attr("class", "main")
-		.append("svg:svg")
-		    .attr("width", w)
-		    .attr("height", h)
-		  	.append("svg:g");
-svg.append("svg:image")
-   .attr('class', 'mainmap')
-   .attr('x',0)
-   .attr('y',0)
-   .attr('width', mapw)
-   .attr('height', maph)
-   .attr("xlink:href","img/bgmap.svg")
 
+function anyStrike(placeConflicts){
+	return placeConflicts.values.totalStrikes > 0;
+}
 
 var tip = d3.tip()
   .attr('class', 'd3-tip')
@@ -82,94 +91,114 @@ var tip = d3.tip()
 	    .format(placeConflicts.key, values.place.country, values.totalStrikes);
   })
 
+function updateConflicts(){
+  	conflictsByPlace = cbp.entries(conflicts);
+  	var filtered = conflictsByPlace.filter(anyStrike);
+    conflictsTotals = ct.map(filtered);
 
-function updateConflicts(nodes){
-	conflicts = nodes;
-  	conflictsByPlace = cbp.entries(nodes);
-    conflictsTotals = ct.map(conflictsByPlace);
+    svg.selectAll("g.target")
+		.data(filtered)
+		.exit()
+		.attr("opacity", "0");
+
+	// update existing, then:
+	svg.selectAll("g.target")
+		.data(filtered)
+		.enter()
+		// add missing elements
+		.append("svg:g")
+			.attr("class", "target")
+			.attr("transform", function(placeConflicts) { 
+				var coords = placeConflicts.values.place.coordinates;
+				return "translate({0},{1})".format(coords.x, coords.y);
+			})
+
+	svg.selectAll("g.target")
+		.data(filtered)
+		.attr('opacity', function(placeConflict) {
+	      var minimumOpacity = 0.3;
+	      return minimumOpacity + placeConflict.values.totalStrikes*(1-minimumOpacity)/ conflictsTotals.totals.maxStrikes;
+	   });
+
+
+/*			.on("mouseover", tip.show)
+			.on("mousemove", tip.show)
+			.on("mouseout", tip.hide)
+	svg.selectAll("g").call(tip)
+*/
+/*	svg.selectAll("g.target")
+		.data(filtered)
+		.enter()
+		.append('svg:circle')
+		   .attr('class',target-bg')
+		   .attr('cx', 23)
+		   .attr('cy',23)
+		   .attr('r',20)
+		   .attr('class', "targetBg")
+		   .attr('opacity', 0.01);
+
+*/
+
+
+	// now draw each target into his own svg element
+	svg.selectAll("g.target")
+		.data(filtered)
+		.append('svg:path')
+		// resize each target path
+	    .attr('transform','scale(0.5)')
+	    .attr('class', 'target')
+	    .attr('d', _targetPath)
+	    // fill is depending on totalStrikes
+	   	.attr('fill', function(placeConflict) {
+	      var percentage = placeConflict.values.totalStrikes / conflictsTotals.totals.maxStrikes;
+	      if (percentage <= 0 || percentage >= 1) console.log("percentage: "+percentage);
+	      var startr = 254, startg = 198, startb = 108,
+	          endr = 168, endg = 0, endb = 4;
+	      var diffr = endr - startr,
+	          diffg = endg - startg,
+	          diffb = endb - startb;
+
+	      var r = Math.floor(diffr * percentage + startr),
+	        g = Math.floor(diffg * percentage + startg),
+	        b = Math.floor(diffb * percentage + startb);
+	      var color = "rgb("+r+","+g+","+b+")";
+	      return color;
+	   })
+		// opacity is depending on totalStrikes
+	   .attr('opacity', function(placeConflict) {
+	      var minimumOpacity = 0.3;
+	      return minimumOpacity + placeConflict.values.totalStrikes*(1-minimumOpacity)/ conflictsTotals.totals.maxStrikes;
+	   });
+
 }
 
 d3.json("data/strikes.json", function(jsondata) {
   data = jsondata
-  cmap = cmap.nodes(jsondata, mapw, maph);  
-  updateConflicts(cmap.nodes());
-  
-var targetSet = 
-	svg.selectAll("g")
-	// foreach place with conflicts
-	.data(conflictsByPlace)
-	.enter()
-	// draw a new <svg><g></g></svg> element
-	.append("svg:g")
-	// center it to place coords
-	.attr("transform", function(placeConflicts) { 
-		var coords = placeConflicts.values.place.coordinates;
-		return "translate({0},{1})".format(coords.x, coords.y);
-	})
-	.on("mouseover", tip.show)
-	.on("mousemove", tip.show)
-	.on("mouseout", tip.hide);
-
-
-// draw a background circle, too, to bind the tip to it
-targetSet.append('svg:circle')
-	   .attr('cx', 23)
-	   .attr('cy',23)
-	   .attr('r',20)
-	   .attr('class', "targetBg")
-	   .attr('opacity', 0.01)
-	   .call(tip)
-
-// now draw each target into his own svg element
-var target = targetSet
-	.append('svg:path')
-	// resize each target path
-    .attr('transform','scale(0.5)')
-    .attr('class', 'target')
-    .attr('d', _targetPath)
-    // fill is depending on totalStrikes
-   	.attr('fill', function(placeConflict) {
-      var percentage = placeConflict.values.totalStrikes / conflictsTotals.totals.maxStrikes;
-      if (percentage <= 0 || percentage >= 1) console.log("percentage: "+percentage);
-      var startr = 254, startg = 198, startb = 108,
-          endr = 168, endg = 0, endb = 4;
-      var diffr = endr - startr,
-          diffg = endg - startg,
-          diffb = endb - startb;
-
-      var r = Math.floor(diffr * percentage + startr),
-        g = Math.floor(diffg * percentage + startg),
-        b = Math.floor(diffb * percentage + startb);
-      var color = "rgb("+r+","+g+","+b+")";
-      return color;
-   })
-	// opacity is depending on totalStrikes
-   .attr('opacity', function(placeConflict) {
-      var minimumOpacity = 0.3;
-      return minimumOpacity + placeConflict.values.totalStrikes*(1-minimumOpacity)/ conflictsTotals.totals.maxStrikes;
-   });
+  cmap = cmap.nodes(jsondata, mapw, maph);
+  conflicts = cmap.nodes();
+  updateConflicts();
+});
 
 var ts = d3.timeslider(svg)
   .width(w)
   .height(100)
+  .marginTop(h-100)
   .timeRange([new Date("2015-01-01"), new Date("2016-08-31")])
   .startDate(new Date("2016-01-01"))
   // whenever the timeslider changes its value
   .onBrush(function(date){
   		sMonth = date.getMonth()+1
   		sYear = date.getFullYear()
-  		//console.log(JSON.stringify(conflictsByPlace))
-  		var filtered = conflictsByPlace.filter(function(placeConflict){
-			return placeConflict.values.totalStrikes == 0;
-		})
-	  	d3.selectAll(".target")
-			.data(filtered)
-			.exit()
-			.remove()
+  		if (sMonth != sLastMonth || sYear != sLastYear) {
+  			sLastMonth = sMonth
+  			sLastYear = sYear
+  			updateConflicts();
+  		}
   });
 
 // draw the timeslider into a new <g> element
 svg.append('g')
+	.attr('class', 'timeslider')
 	.attr('id','timeslider')
 	.call(ts.draw);
 
@@ -177,9 +206,7 @@ d3.selectAll(".target")
    .transition()
    .duration(2000)
    .delay(0,1)
-   .attr("transform", "scale(0.7) translate(-10,-10)")
-
-});
+   .attr("transform", "scale(0.7) translate(-10,-10)");
 
 function size(conflict) {
   return conflict.strikes;

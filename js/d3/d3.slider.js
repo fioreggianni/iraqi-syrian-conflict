@@ -13,6 +13,7 @@ d3.timeslider = function() {
       sMarginLeft = 15,
       sMarginRight = 15,
       sMarginTop = 0,
+      scMarginTop = 600,
       sMarginBottom = 0,
       brush = null,
       handle = null,
@@ -35,11 +36,12 @@ d3.timeslider = function() {
 
 
       var svg = d3.select("#"+nodeId)
+        .attr("transform", "translate(0, "+scMarginTop+")")
         .append("svg")
         .attr("width", sWidth)
         .attr("height", sHeight)
         .append("g")
-        .attr("transform", "translate("+sMarginLeft+","+sMarginTop+")");
+        .attr("transform", "translate("+sMarginLeft+","+ sMarginTop+")");
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0, "+sHeight/2+")")
@@ -78,7 +80,6 @@ d3.timeslider = function() {
   }
 
 
-
   timeslider.attr = function(n, v) {
     console.log("inside attr");
     if (arguments.length < 2 && typeof n === 'string') {
@@ -103,6 +104,18 @@ d3.timeslider = function() {
 
     return timeslider
   }
+
+   timeslider.marginBottom = function(margin){
+      if (!arguments.length) return sMarginBottom;
+      sMarginBottom = margin;
+      return timeslider;
+    }
+
+   timeslider.marginTop = function(margin){
+      if (!arguments.length) return scMarginTop;
+      scMarginTop = margin;
+      return timeslider;
+    }
 
   timeslider.offset = function(v) {
     if (!arguments.length) return offset
