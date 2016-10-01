@@ -70,7 +70,7 @@ svg.append("svg:image")
    .attr('y',0)
    .attr('width', mapw)
    .attr('height', maph)
-   .attr("xlink:href","bgmap.svg")
+   .attr("xlink:href","img/bgmap.svg")
 
 
 var tip = d3.tip()
@@ -89,7 +89,7 @@ function updateConflicts(nodes){
     conflictsTotals = ct.map(conflictsByPlace);
 }
 
-d3.json("strikes.json", function(jsondata) {
+d3.json("data/strikes.json", function(jsondata) {
   data = jsondata
   cmap = cmap.nodes(jsondata, mapw, maph);  
   updateConflicts(cmap.nodes());
