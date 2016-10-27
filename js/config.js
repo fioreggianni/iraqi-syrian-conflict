@@ -47,7 +47,7 @@ function getConfig(){
 	config.bars = {
 		h: {
 			max: config.maph * 0.2,
-			min: config.maph * 0.01
+			min: 0
 		},
 		color: "brown",
 		opacity: {
@@ -68,7 +68,7 @@ function getConfig(){
 	config.targets = {
 		background: "black",
 		color: "orange",
-		radius: config.maph*0.04,
+		radius: config.maph*0.05,
 		opacity: {
 			min: 0.2,
 			max: 0.7
@@ -98,7 +98,7 @@ function getConfig(){
 	config.tooltip = {
 		color: "orange",
 		background: "black",
-		padding: config.targets.radius / 8
+		padding: config.targets.radius / 16
 	}
 
 	return config;

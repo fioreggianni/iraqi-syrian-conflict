@@ -71,7 +71,11 @@ d3.warmap = function(cfg){
 			.attr("class", "target")
 			.attr("cx", getTargetX)
 			.attr("cy", getTargetY)
-			.attr("r", cfg.targets.radius)
+			.attr("r", function(placeConflicts){
+				var min = Math.floor(cfg.targets.radius * 0.5);
+				return min + (placeConflicts.values.totalStrikes / state.maxStrikes())
+					 * (cfg.targets.radius - min);
+			})
 			.style("fill", cfg.targets.background)
 			.attr("opacity", function(placeConflicts) { 
 				return getTargetOpacity(placeConflicts, state)
@@ -122,7 +126,7 @@ d3.warmap = function(cfg){
 		.attr("y", getTargetY)
         .attr("font-family", "sans-serif")
         .attr("font-weight", 700)
-        .attr("font-size", Math.floor(cfg.targets.radius*0.7)+"px")
+        .attr("font-size", Math.floor(cfg.targets.radius*0.4)+"px")
         .attr("fill", cfg.targets.color)
         .style("text-anchor", "middle")
         .attr("opacity", function(placeConflicts){
@@ -176,12 +180,14 @@ d3.warmap = function(cfg){
 
 		d3.select(".tooltip")
 			.text("Near "+placeName)
-			.style("top", target.attr("cy"))
+			.style("top", parseInt(target.attr("cy")) - parseInt(target.attr("r")*0.3) )
 			.style("left",parseInt(target.attr("cx"))
-				+ Math.floor(_cfg.targets.radius*0.9))
+				+ parseInt(target.attr("r")))
+			.style("font-size", parseInt(_cfg.targets.radius*0.4))
 			.style("color", _cfg.tooltip.color)
 			.style("background", _cfg.tooltip.background)
 			.style("padding", _cfg.tooltip.padding)
+			.style("padding-left", _cfg.tooltip.padding*4)
 			.style("visibility", "visible");
 
 	}

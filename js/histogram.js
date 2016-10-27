@@ -147,7 +147,7 @@ d3.histogram = function(config){
 			  		return getBarX(conflictMonth) + _barWidth/2
 			  	})
 	            .attr("y", function(conflictMonth) { 
-	            	return getBarY(conflictMonth, state) - 10 
+	            	return getBarY(conflictMonth, state) - 5 
 	            })
 	            .text( function (conflictMonth) { 
 	            	return conflictMonth.values.totalStrikes; 
@@ -177,7 +177,7 @@ d3.histogram = function(config){
 			  		return getBarX(conflictMonth) + _barWidth/2
 			  	})
 	            .attr("y", function(conflictMonth) { 
-	            	return _cfg.bars.h.max + _cfg.bars.h.min +_cfg.slider.h/3})
+	            	return _cfg.bars.h.max +_cfg.slider.h*0.5})
 	            .text( function (conflictMonth) { 
 	            	return moment.utc(conflictMonth.values.year
 	            		+"-"
@@ -209,7 +209,7 @@ d3.histogram = function(config){
 			  		return getBarX(conflictMonth) + _barWidth/2
 			  	})
 	            .attr("y", function(conflictMonth) { 
-	            	return _cfg.bars.h.max + _cfg.bars.h.min +_cfg.slider.h/3 + 12})
+	            	return _cfg.bars.h.max + _cfg.slider.h*0.5 + 12})
 	            .text( function (conflictMonth) { 
 	            	return moment.utc(conflictMonth.values.year
 	            		+"-"
