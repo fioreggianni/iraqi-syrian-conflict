@@ -17,10 +17,8 @@ d3.tip = function() {
 
   function tip(vis) {
     if (!vis) {
-      console.log("!vis");
       return;
     }
-    console.log("vis is "+vis);
     svg = getSVGNode(vis)
     point = svg.createSVGPoint()
     document.body.appendChild(node)
@@ -226,14 +224,10 @@ d3.tip = function() {
   }
 
   function getSVGNode(el) {
-    console.log("el is "+el)
     el = el.node()
-    console.log("processed. el is "+el + " and el.tagName is "+el.tagName + " and el.ownerSVGElement is "+JSON.stringify(el.ownerSVGElement))
     if(el.tagName.toLowerCase() == 'svg') {
-      console.log("inside");
       return el
     }
-    console.log("outside");
     return el.ownerSVGElement
   }
 

@@ -10,8 +10,8 @@ d3.timeslider = function() {
       sDate = null,
       sWidth = null,
       sHeight = null,
-      sMarginLeft = 15,
-      sMarginRight = 15,
+      sMarginLeft = 0,
+      sMarginRight = 0,
       sMarginTop = 0,
       scMarginTop = 600,
       sMarginBottom = 0,
@@ -19,29 +19,26 @@ d3.timeslider = function() {
       handle = null,
       timeScale = null,
       sMonth = null;
-    
+  
   timeslider.draw = function() {
 	nodeId = "timeslider"
-    timeScale = d3.time.scale()
+      timeScale = d3.time.scale()
       .domain(tRange)
       .range([0, sWidth - sMarginLeft - sMarginRight])
       .clamp(true);
 
       sMonth = sDate;
-      console.log("timeScale => " + timeScale);
       brush = d3.svg.brush()
         .x(timeScale)
         .extent([sDate, sDate])
         .on("brush", brushed);
 
-
       var svg = d3.select("#"+nodeId)
-        .attr("transform", "translate(0, "+scMarginTop+")")
         .append("svg")
+        .attr("transform", "translate("+sMarginLeft+","+ scMarginTop+")")
         .attr("width", sWidth)
         .attr("height", sHeight)
         .append("g")
-        .attr("transform", "translate("+sMarginLeft+","+ sMarginTop+")");
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0, "+sHeight/2+")")
@@ -59,19 +56,26 @@ d3.timeslider = function() {
             return this.parentNode.appendChild(this.cloneNode(true));
           })
           .attr("class", "halo");
-        
+
       var slider = svg.append("g")
         .attr("class", "slider")
         .call(brush);
-        slider.selectAll(".extent,.resize").remove();
-        slider.select(".background").attr("height", sHeight);
+
+      slider.selectAll(".extent,.resize").remove();
+      slider.select(".background").attr("height", sHeight);
+
       handle = slider.append("g").attr("class", "handle")
       handle.append("path")
         .attr("transform", "translate(0," + sHeight / 2 + ")")
-        .attr("d", "M 0 -20 V 20")
+        .attr("d", "M 0 -30 V 25")
       handle.append('text')
+        .attr("class", "slider-month")
         .text(sDate)
-        .attr("transform", "translate(-18 ," + (sHeight / 2 - 25) + ")");
+        .attr("transform", "translate(-22 ," + ((sHeight / 2) - 5) + ")");
+      handle.append('text')
+        .attr("class", "slider-year")
+        .text(sDate)
+        .attr("transform", "translate(-22 ," + ((sHeight / 2) + 15) + ")");
       slider.call(brush.event);
       return timeslider;
   }
@@ -81,7 +85,6 @@ d3.timeslider = function() {
 
 
   timeslider.attr = function(n, v) {
-    console.log("inside attr");
     if (arguments.length < 2 && typeof n === 'string') {
       return d3.select("#"+nodeId).attr(n)
     } else {
@@ -94,7 +97,6 @@ d3.timeslider = function() {
 
  
   timeslider.style = function(n, v) {
-    console.log("inside style");
     if (arguments.length < 2 && typeof n === 'string') {
       return d3.select("#"+nodeId).style(n)
     } else {
@@ -129,24 +131,34 @@ d3.timeslider = function() {
     return timeslider
   }
 
+  timeslider.timeScale = function(){
+    return timeScale
+  }
+
   function d3_slider_offset() { return [0, 0] }
   function d3_slider_html() { return '<b>oh yeah!</b>' }
 
   function brushed() {
-    console.log("within brushed");
+
     var value = brush.extent()[0];
     if (d3.event.sourceEvent) { // not a programmatic event
       value = timeScale.invert(d3.mouse(this)[0]);
       brush.extent([value, value]);
     }
     selectedMonth = value;
-    handle.attr("transform", "translate("+timeScale(value)+",0)");
-    handle.select('text').text(formatDate(value));
+    var halfOfMonth = new Date(value.getFullYear(), value.getMonth(), 15);
+    var xmove = timeScale(halfOfMonth);
+    var formattedMonth = d3.time.format("%b")(value).toUpperCase()
+    var formattedYear =  d3.time.format("%Y")(value)
+
+    handle.attr("transform", "translate("+xmove+",0)");
+    handle.select('text.slider-month').text(formattedMonth);
+    handle.select('text.slider-year').text(formattedYear);
+
     onBrush(value);
   }
 
   function onBrush(value){
-  	console.log("brushed to value: "+value)
   }
   timeslider.onBrush = function(f){
   	if (!arguments) return onBrush;
