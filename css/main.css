@@ -1,0 +1,33 @@
+.slider-text {
+	font-family: monospace;
+	font-weight: 400;
+}
+
+.map-title {
+	background: white;
+	opacity: 0.9;
+	font-size: 18px;
+	font-weight: 600;
+	padding: 5px;
+	position: absolute;
+	z-index: 10;
+	top: 15px;
+	left: 20px;
+}
+
+.tick {
+	font-weight: 500;
+	color: yellow;
+}
+
+.barTick, .barYearTick {
+	cursor: pointer;
+}
+
+.target-label, .tooltip, .drag-tip {
+	pointer-events: none;
+}
+
+.histogramBar:hover, .barCaption:hover, .target:hover {
+	cursor: pointer;
+}
