@@ -1,3 +1,7 @@
+/*
+ * js/utils.js
+ * A set of functions useful to deal with filters and dates
+ */
 function padMonth(month){
 	if (month.toString().length == 1) return "0"+month;
 	return month.toString();

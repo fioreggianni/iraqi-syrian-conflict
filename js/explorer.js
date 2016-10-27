@@ -1,3 +1,7 @@
+/*
+ * js/explorer.js
+ * A custom d3 component to explore the conflicts dataset
+ */
 d3.explorer = function(config){
 	var _cfg = config;
 
@@ -53,7 +57,9 @@ d3.explorer = function(config){
 
 	explorer.draw = function(state){
 		var title = "Select a place";
-		var filters = "From "+state.fromDate().format("YYYY/MM/DD") +" to "+state.toDate().format("YYYY/MM/DD");
+		var filters = "From "
+			+state.fromDate().format("YYYY/MM/DD") 
+			+" to "+state.toDate().format("YYYY/MM/DD");
 		var strikes = ""; 		
 		if (state.placeConflicts()){
 			title = "Near "+state.placeConflicts().key.toUpperCase();
@@ -85,5 +91,3 @@ d3.explorer = function(config){
 
 	return explorer;	
 }
-
-

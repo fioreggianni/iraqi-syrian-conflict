@@ -1,3 +1,7 @@
+/*
+ * js/config.js
+ * A function to get configuration values with respect to available space
+ */
 function getConfig(){
 	var config = {
 		w: window.innerWidth * 0.95,

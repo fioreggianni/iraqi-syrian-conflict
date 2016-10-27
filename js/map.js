@@ -1,3 +1,7 @@
+/*
+ * js/map.js
+ * Main representation of the interactive map engine
+ */
 d3.warmap = function(cfg){
 	var _cfg = cfg;
 	var _onEvent = function(){};

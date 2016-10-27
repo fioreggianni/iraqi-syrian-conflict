@@ -1,3 +1,7 @@
+/*
+ * js/histogram.js
+ * A custom d3 component to draw an histogram
+ */
 d3.histogram = function(config){
 	var _cfg = config;
 	var _workspace = null, _barWidth = 0, 

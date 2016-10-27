@@ -1,3 +1,7 @@
+/*
+ * js/slider.js
+ * A custom d3 component to deal with datetime range selection
+ */
 d3.slider = function(config){
 	var _cfg = config;
 	var _workspace, _onEvent = function(){}, 

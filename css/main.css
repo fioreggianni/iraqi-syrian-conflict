@@ -1,3 +1,6 @@
+/* 
+ * css/main.css
+ */
 .slider-text {
 	font-family: monospace;
 	font-weight: 400;
@@ -20,14 +23,11 @@
 	color: yellow;
 }
 
-.barTick, .barYearTick {
-	cursor: pointer;
-}
-
 .target-label, .tooltip, .drag-tip {
 	pointer-events: none;
 }
 
-.histogramBar:hover, .barCaption:hover, .target:hover {
+.histogramBar:hover, .barCaption:hover, .target:hover,
+.barTick, .barYearTick {
 	cursor: pointer;
 }

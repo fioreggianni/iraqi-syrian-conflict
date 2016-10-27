@@ -1,7 +1,13 @@
+<!--
+  index.html
+  Entry point for the interactive map
+  -->
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <link type="text/css" rel="stylesheet" href="css/main.css">
+    <meta http-equiv="Content-Type" 
+    	content="text/html;charset=utf-8">
+    <link type="text/css" rel="stylesheet" 
+    	href="css/main.css">
     <script src="js/d3/d3.v3.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/moment.min.js"></script>
@@ -15,7 +21,7 @@
     <script type="text/javascript">
     	var state = {}; var warmap = {}; var slider = {};
     	var histogram = {}; var explorer = {};
-    	var workspace = null; var countryswitch = {}
+    	var workspace = {}; var countryswitch = {}
     	var config = getConfig();
     </script>
     <title>Iraqi-Syrian Conflict</title>
@@ -35,19 +41,16 @@
 			workspace.html("");
 			state = d3.state(config).data(ldata)
 			warmap = d3.warmap(config)
-			.workspace(workspace)
-			.onEvent(dispatch);
-
+				.workspace(workspace)
+				.onEvent(dispatch);
 			warmap.init(state);
 			explorer = d3.explorer(config).init(state);
-
 			var sliderWorkspace = d3.select("div.main")
 				.select("svg")
 				.append("g")
 			slider = d3.slider(config)
 			   .workspace(sliderWorkspace)
 			   .onEvent(dispatch);
-
 			slider.init(state);
 		   	var histogramWorkspace = 
 				d3.select("div.main")
@@ -58,12 +61,11 @@
 				.timeScale(slider.timeScale())
 				.onEvent(dispatch);
 			histogram.init(state);
-
 			draw();
 		}
 
 		window.onresize = function(event) {
-				onDataLoaded(state.data())
+			onDataLoaded(state.data())
 		};
 
 		function dispatch(event, args){
@@ -90,9 +92,7 @@
 			}
 			events[event]();
 		}
-
 		d3.json("data/strikes.json", onDataLoaded);
-
 	</script>
 </body>
 </html>

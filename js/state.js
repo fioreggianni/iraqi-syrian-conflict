@@ -1,3 +1,8 @@
+/*
+ * state.js
+ * A module to save current state of the interactive map
+ */
+
 d3.state = function module(config) {
 	var _cfg = config;
 	var _fromDate, _toDate, _minDate, _maxDate, _data, 
